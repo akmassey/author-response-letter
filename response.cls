@@ -1,6 +1,7 @@
 % An article class for author response to reviewer comment.
 % Copyright (C) 2017 Martin Schroen
 % Modifications Copyright (C) 2020 Kaishuo Zhang
+% Additional Modifications Copyright (C) 2020 Aaron Massey
 %
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -16,35 +17,46 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ar2rc}[2020/08/04 Author response to reviewer comment class]
+\ProvidesClass{response}[2020/08/04 Author response to reviewer comment class]
 \LoadClass{article}
 
 \RequirePackage[includeheadfoot,top=20mm, bottom=20mm, footskip=2.5cm]{geometry}
 
 % Typography
 \RequirePackage[T1]{fontenc}
-\RequirePackage{times}
-%\RequirePackage{mathptmx} % math also in times font
-\RequirePackage{amssymb,amsmath}
-\RequirePackage{microtype}
 \RequirePackage[utf8]{inputenc}
+\RequirePackage{microtype}
+
+% Fonts
+\RequirePackage{mathpazo}
+\RequirePackage[scaled]{beramono}
+\RequirePackage{amssymb,amsmath}
+
+% For fancy shadow boxes
+\RequirePackage[many]{tcolorbox}
+\usetikzlibrary{shadows}
+
+\newtcolorbox{shadedbox}{
+  drop shadow southeast,
+  breakable,
+  enhanced jigsaw,
+  colback=white,
+}
 
 % Misc
 \RequirePackage{graphicx}
-\RequirePackage{hyperref} 
+\RequirePackage{hyperref}
 \RequirePackage{soul} % Highlight using \hl{}
 
 % Table
-\RequirePackage{adjustbox} % center large tables across textwidth by surrounding tabular with \begin{adjustbox}{center}
-\renewcommand{\arraystretch}{1.5} % enlarge spacing between rows
-\RequirePackage{caption} 
+\RequirePackage{caption}
 \captionsetup[table]{skip=10pt} % enlarge spacing between caption and table
 
 % Section styles
 \RequirePackage{titlesec}
 \titleformat{\section}{\normalfont\large}{\makebox[0pt][r]{\bf \thesection.\hspace{4mm}}}{0em}{\bfseries}
 \titleformat{\subsection}{\normalfont}{\makebox[0pt][r]{\bf \thesubsection.\hspace{4mm}}}{0em}{\bfseries}
-\titlespacing{\subsection}{0em}{1em}{-0.3em} % left before after
+\titlespacing{\subsection}{0em}{1em}{-0.3em}% left before after
 
 % Paragraph styles
 \setlength{\parskip}{0.6\baselineskip}%
@@ -55,25 +67,22 @@
 \renewmdenv[leftmargin=0.4em, rightmargin=0.4em%
 innerleftmargin=0.6em,innerrightmargin=0.6em]{quote}
 
-% Table styles
-\let\oldtabular=\tabular
-\let\endoldtabular=\endtabular
-\renewenvironment{tabular}[1]{\begin{adjustbox}{center}\begin{oldtabular}{#1}}{\end{oldtabular}\end{adjustbox}}
-
 % Shortcuts
 %% Let textbf be both, bold and italic
 %\DeclareTextFontCommand{\textbf}{\bfseries\em}
 
-%% Add RC and AR to the left of a paragraph
-%\def\RC{\makebox[0pt][r]{\bf RC:\hspace{4mm}}}
-%\def\AR{\makebox[0pt][r]{AR:\hspace{4mm}}}
 
-%% Define that \RC and \AR should start and format the whole paragraph 
-\RequirePackage{suffix}
-\long\def\RC#1\par{\makebox[0pt][r]{\bf RC:\hspace{4mm}}\textbf{\textit{#1}}\par} %\RC
-\WithSuffix\long\def\RC*#1\par{\textbf{\textit{#1}}\par} %\RC*
-\long\def\AR#1\par{\makebox[0pt][r]{AR:\hspace{10pt}}#1\par} %\AR
-\WithSuffix\long\def\AR*#1\par{#1\par} %\AR*
+% Environment for reviewer comments
+\newcounter{reviewercomment}[section]
+\newenvironment{reviewer}[1][]{\refstepcounter{reviewercomment}\par\medskip
+   \noindent \textbf{Reviewer Comment~\thereviewercomment. #1}
+ \rmfamily\begin{shadedbox}}{\end{shadedbox}\medskip}
+
+% Environment for responses to reviewer comments
+\newcounter{responsecomment}[section]
+\newenvironment{response}[1][]{\refstepcounter{responsecomment}\par\medskip
+   \noindent \textbf{Response to Reviewer Comment~\theresponsecomment. #1}
+ \rmfamily}{\medskip}
 
 %%%
 %DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
@@ -108,7 +117,6 @@ innerleftmargin=0.6em,innerrightmargin=0.6em]{quote}
 {\Large\bf \lettertitle}\\[1em]
 {\LARGE \@title}\\[1em]
 {\@author}\\
-{\it \@journal, }\texttt{\@doi}\\
+{\it \@journal,\/ }\texttt{\@doi}\\
 \hrule
-\hfill {\bfseries RC:} \textbf{\textit{Reviewers' Comment}},\(\quad\) AR: Authors' Response, \(\quad\square\) Manuscript Text
-}
+\hfill}
